@@ -11,7 +11,6 @@ SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
 
-
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
@@ -55,7 +54,11 @@ CREATE TABLE `movimentacoes` (
 
 CREATE TABLE `pochetes` (
   `id` bigint(20) NOT NULL,
-  `sala_id` bigint(20) NOT NULL
+  `sala_id` bigint(20) NOT NULL,
+  `idToken` varchar(8) UNIQUE,  -- Coluna idToken adicionada
+  PRIMARY KEY (`id`),
+  KEY `fk_sala` (`sala_id`),  -- Índice para sala_id
+  CONSTRAINT `fk_sala` FOREIGN KEY (`sala_id`) REFERENCES `salas` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -186,6 +189,7 @@ ALTER TABLE `movimentacoes`
 --
 ALTER TABLE `pochetes`
   ADD CONSTRAINT `fk_sala` FOREIGN KEY (`sala_id`) REFERENCES `salas` (`id`);
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
