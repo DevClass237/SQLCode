@@ -68,8 +68,9 @@ CREATE TABLE `pochetes` (
 --
 
 CREATE TABLE `professores` (
-  `matricula` bigint(20) NOT NULL,
-  `nome` text NOT NULL
+  `matricula` int(4) NOT NULL PRIMARY KEY,
+  `nome` VARCHAR(100) NOT NULL,
+  INDEX (nome)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
