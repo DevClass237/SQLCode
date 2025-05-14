@@ -55,9 +55,9 @@ CREATE TABLE `movimentacoes` (
 CREATE TABLE `pochetes` (
   `id` bigint(20) NOT NULL,
   `sala_id` bigint(20) NOT NULL,
-  `idToken` varchar(8) UNIQUE,  -- Coluna idToken adicionada
+  `idToken` varchar(8) UNIQUE,
   PRIMARY KEY (`id`),
-  KEY `fk_sala` (`sala_id`),  -- Índice para sala_id
+  KEY `fk_sala` (`sala_id`),
   CONSTRAINT `fk_sala` FOREIGN KEY (`sala_id`) REFERENCES `salas` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -70,7 +70,7 @@ CREATE TABLE `pochetes` (
 CREATE TABLE `professores` (
   `matricula` int(4) NOT NULL PRIMARY KEY,
   `nome` VARCHAR(100) NOT NULL,
-  INDEX (nome)
+  INDEX (`nome`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -96,100 +96,90 @@ CREATE TABLE `usuarios` (
   `senha` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- Estrutura para tabela `dados_temporarios`
+--
+
+CREATE TABLE `dados_temporarios` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `conteudo1` INT(4),
+  `conteudo2` INT(8),
+  `criado_em` DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Evento para limpeza automática dos dados temporários
+--
+
+SET GLOBAL event_scheduler = ON;
+
+CREATE EVENT IF NOT EXISTS limpar_dados_temporarios
+ON SCHEDULE EVERY 5 MINUTE
+DO
+  DELETE FROM dados_temporarios
+  WHERE criado_em < NOW() - INTERVAL 30 MINUTE;
+
+-- --------------------------------------------------------
+
+-- Verifique se o agendador de eventos está ativado:
+-- SHOW VARIABLES LIKE 'event_scheduler';
+
+-- Caso esteja OFF e você tenha permissão:
+-- SET GLOBAL event_scheduler = ON;
+
 --
 -- Índices para tabelas despejadas
 --
 
---
--- Índices de tabela `admins`
---
 ALTER TABLE `admins`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `nome` (`nome`);
 
---
--- Índices de tabela `movimentacoes`
---
 ALTER TABLE `movimentacoes`
   ADD PRIMARY KEY (`id`),
   ADD KEY `professor_matricula` (`professor_matricula`),
   ADD KEY `pochete_id` (`pochete_id`);
 
---
--- Índices de tabela `pochetes`
---
 ALTER TABLE `pochetes`
   ADD PRIMARY KEY (`id`),
   ADD KEY `fk_sala` (`sala_id`);
 
---
--- Índices de tabela `professores`
---
-ALTER TABLE `professores`
-  ADD PRIMARY KEY (`matricula`);
-
---
--- Índices de tabela `salas`
---
 ALTER TABLE `salas`
   ADD PRIMARY KEY (`id`);
 
---
--- Índices de tabela `usuarios`
---
 ALTER TABLE `usuarios`
   ADD PRIMARY KEY (`id`);
 
 --
--- AUTO_INCREMENT para tabelas despejadas
+-- AUTO_INCREMENT para tabelas
 --
 
---
--- AUTO_INCREMENT de tabela `admins`
---
 ALTER TABLE `admins`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
---
--- AUTO_INCREMENT de tabela `movimentacoes`
---
 ALTER TABLE `movimentacoes`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
---
--- AUTO_INCREMENT de tabela `pochetes`
---
 ALTER TABLE `pochetes`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
---
--- AUTO_INCREMENT de tabela `salas`
---
 ALTER TABLE `salas`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
 
---
--- AUTO_INCREMENT de tabela `usuarios`
---
 ALTER TABLE `usuarios`
   MODIFY `id` bigint(20) NOT NULL AUTO_INCREMENT;
-
---
--- Restrições para tabelas despejadas
---
 
 --
 -- Restrições para tabelas `movimentacoes`
 --
+
 ALTER TABLE `movimentacoes`
   ADD CONSTRAINT `movimentacoes_ibfk_1` FOREIGN KEY (`professor_matricula`) REFERENCES `professores` (`matricula`),
   ADD CONSTRAINT `movimentacoes_ibfk_2` FOREIGN KEY (`pochete_id`) REFERENCES `pochetes` (`id`);
-
---
--- Restrições para tabelas `pochetes`
---
-ALTER TABLE `pochetes`
-  ADD CONSTRAINT `fk_sala` FOREIGN KEY (`sala_id`) REFERENCES `salas` (`id`);
 
 COMMIT;
 
